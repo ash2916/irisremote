@@ -1,0 +1,49 @@
+{
+  "id": "com.irisremote.IrisRemote",
+  "runtime": "org.freedesktop.Platform",
+  "runtime-version": "21.08",
+  "sdk": "org.freedesktop.Sdk",
+  "command": "irisremote",
+  "icon": "share/icons/hicolor/scalable/apps/irisremote.svg",
+  "modules": [
+    "shared-modules/libappindicator/libappindicator-gtk3-12.10.json",
+    "xdotool.json",
+    {
+      "name": "irisremote",
+      "buildsystem": "simple",
+      "build-commands": [
+        "bsdtar -zxvf irisremote-1.2.3.deb",
+        "tar -xvf ./data.tar.xz",
+        "cp -r ./usr/*  /app/",
+        "mkdir -p /app/bin && ln -s /app/lib/irisremote/irisremote /app/bin/irisremote",
+        "mv /app/share/applications/irisremote.desktop /app/share/applications/com.irisremote.IrisRemote.desktop",
+        "sed -i '/^Icon=/ c\\Icon=com.irisremote.IrisRemote' /app/share/applications/com.irisremote.IrisRemote.desktop",
+        "sed -i '/^Icon=/ c\\Icon=com.irisremote.IrisRemote' /app/share/applications/irisremote-link.desktop",
+        "mv /app/share/icons/hicolor/scalable/apps/irisremote.svg /app/share/icons/hicolor/scalable/apps/com.irisremote.IrisRemote.svg",
+        "for size in 16 24 32 48 64 128 256 512; do\n rsvg-convert -w $size -h $size -f png -o $size.png logo.svg\n install -Dm644 $size.png /app/share/icons/hicolor/${size}x${size}/apps/com.irisremote.IrisRemote.png\n done"
+      ],
+      "cleanup": ["/include", "/lib/pkgconfig", "/share/gtk-doc"],
+      "sources": [
+        {
+          "type": "file",
+          "path": "../irisremote-1.2.3.deb"
+        },
+        {
+          "type": "file",
+          "path": "../res/logo.svg"
+        }
+      ]
+    }
+  ],
+  "finish-args": [
+    "--share=ipc",
+    "--socket=x11",
+    "--socket=fallback-x11",
+    "--socket=wayland",
+    "--share=network",
+    "--filesystem=home",
+    "--device=dri",
+    "--socket=pulseaudio",
+    "--talk-name=org.freedesktop.Flatpak"
+  ]
+}
